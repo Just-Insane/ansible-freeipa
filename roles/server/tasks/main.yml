@@ -1,0 +1,57 @@
+- name: Install the ipa-server package
+  yum:
+    name: ipa-server
+    state: present
+
+- name: Install the ipa-server-dns package
+  yum:
+    name: ipa-server-dns
+    state: present
+
+- firewalld:
+    service: ntp
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: http
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: https
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: ldap
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: ldaps
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: kerberos
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: kpasswd
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: dns
+    permanent: true
+    state: enabled
+
+- name: Reload the firewall configuration
+  command: firewall-cmd --reload
+
+- name: Run the ipa-server-install command
+  command: ipa-server-install -U --setup-dns --hostname={{ inventory_hostname }} --domain={{ domain }} --realm={{ realm }} --ds-password={{ directory_manager_password }} --admin-password={{ principal_user_password }} --forwarder={{ dns_forwarder_1 }} --forwarder={{ dns_forwarder_2 }} --ip-address={{ ansible_host }} --ssh-trust-dns --mkhomedir
+  notify:
+    - reboot

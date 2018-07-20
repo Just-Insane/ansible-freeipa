@@ -1,0 +1,4 @@
+- hosts: replica
+  user: root
+  roles:
+    - replica

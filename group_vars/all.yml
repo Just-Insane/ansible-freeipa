@@ -1,0 +1,9 @@
+server_hostname: freeipa01.domain.com
+domain: domain.com
+realm: DOMAIN.COM
+principal_user: admin
+principal_user_password: <password>
+directory_manager_password: <password>
+dns_forwarder_1: 8.8.8.8
+dns_forwarder_2: 8.8.4.4
+reverse_zone: x.x.x.in-addr.arpa

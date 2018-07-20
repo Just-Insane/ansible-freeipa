@@ -1,0 +1,8 @@
+[server]
+freeipa01.domain.com ansible_host=x.x.x.x
+
+[replica]
+freeipa02.domain.com ansible_host=x.x.x.x
+
+[client]
+client.domain.com ansible_host=x.x.x.x

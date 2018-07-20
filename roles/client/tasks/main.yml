@@ -1,0 +1,19 @@
+- name: Install the ipa-client package
+  yum:
+    name: ipa-client
+    state: present
+  become: yes
+
+- name: Join IPA Domain
+  command: ipa-client-install --force-ntpd --mkhomedir --ssh-trust-dns --force --enable-dns-updates --domain={{ domain }} --server={{ server_hostname }} --realm={{ realm }} --principal={{ principal_user }} --password={{ principal_user_password }} -U
+  creates: /etc/ipa/default.conf
+  notify:
+    - reboot
+  args:
+    creates: /etc/ipa/default.conf
+  become: yes
+
+- meta: flush_handlers
+
+- name: Waiting for Reboot after FreeIPA Join
+  local_action: wait_for host={{ ansible_ssh_host }} state=started

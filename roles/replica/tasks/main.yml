@@ -1,0 +1,77 @@
+- name: Install the ipa-server package
+  yum:
+    name: ipa-server
+    state: present
+
+- name: Install the ipa-server-dns package
+  yum:
+    name: ipa-server-dns
+    state: present
+
+- firewalld:
+    service: ntp
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: http
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: https
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: ldap
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: ldaps
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: kerberos
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: kpasswd
+    permanent: true
+    state: enabled
+
+- firewalld:
+    service: dns
+    permanent: true
+    state: enabled
+
+- name: Reload the firewall configuration
+  command: firewall-cmd --reload
+
+- name: Install the ipa-client package
+  yum:
+    name: ipa-client
+    state: present
+
+- name: Join IPA Domain
+  command: ipa-client-install --mkhomedir --ssh-trust-dns --force --enable-dns-updates --domain={{ domain }} --server={{ server_hostname }} --realm={{ realm }} --principal={{ principal_user }} --password={{ principal_user_password }} -U
+  notify:
+    - reboot
+
+- name: Create reverse record
+  ipa_dnsrecord:
+    ipa_host: "{{ server_hostname }}"
+    ipa_pass: "{{ principal_user_password }}"
+    state: present
+    zone_name: "{{ reverse_zone }}"
+    record_name: 21
+    record_type: 'PTR'
+    record_value: 'freeipa02.corp.justin-tech.com.'
+
+- name: Run the ipa-replica-install command
+  command: ipa-replica-install --setup-ca --ip-address={{ ansible_host }} --password={{ principal_user_password }} --admin-password={{ principal_user_password }} --ssh-trust-dns --setup-dns --forwarder={{ dns_forwarder_1 }} --forwarder={{ dns_forwarder_2 }} -U
+  notify:
+    - reboot
